@@ -4,11 +4,11 @@ import networkx as nx
 from sympy import *
 
 class graph:
-    def __init__(self, A, if_diGraph = False):
+    def __init__(self, A, if_diGraph = False, special_layout = False):
         self.adjacency_matrix = np.array(A)
         self.diGraph = if_diGraph
+        self.layout = special_layout
         
-    
     def show_A(self, t: int) -> np.array:
         '''
         Метод вычисляет и выводит t-ую степень
@@ -19,7 +19,7 @@ class graph:
         A = np.array(self.adjacency_matrix)
         return np.linalg.matrix_power(A, t)
     
-    def show_paths(self, t: int):
+    def write_paths(self, t: int):
         '''
         Заменяем значения матрицы на переменные и 
         символьно вычисляем t-ую степень.
@@ -115,37 +115,52 @@ class graph:
         #отрисовываем графы
         print(f'Все пути из {v1+1} в {v2+1} длины {t}:')
         print('-'*40)
-        
-        for elem in edges:
-            
-            edges2_colors = []
-            edges2 = []
-            
-            for i in range(len(self.adjacency_matrix)):
-                for j in range(i, len(self.adjacency_matrix)):
-                    if self.adjacency_matrix[i][j] > 0: 
-                            edges2.append([i+1,j+1])
-                            edges2.append([j+1,i+1])
-                            edges2_colors.append('k')
-                            edges2_colors.append('k')
+        if edges:
+            for elem in edges:
+                
+                edges2_colors = []
+                edges2 = []
+                
+                for i in range(len(self.adjacency_matrix)):
+                    for j in range(len(self.adjacency_matrix)):
+                        if self.adjacency_matrix[i][j] > 0: 
+                                edges2.append([i+1,j+1])
+                                if not self.diGraph: edges2.append([j+1,i+1])
+                                edges2_colors.append('k')
+                                if not self.diGraph: edges2_colors.append('k')
 
 
-            for i in range(len(elem)-1):
-                if int(elem[i]) != int(elem[i+1]):
-                    idx1 = edges2.index([int(elem[i]), int(elem[i+1])])
-                    idx2 = edges2.index([int(elem[i+1]), int(elem[i])])
-                    edges2_colors[idx1] = 'r'
-                    edges2_colors[idx2] = 'r'
-            G = nx.Graph()
-            for elem in edges2:
-                idx = edges2.index(elem)
-                G.add_edge(elem[0], elem[1], color = edges2_colors[idx])
-        
-            colors = nx.get_edge_attributes(G,'color').values()
+                for i in range(len(elem)-1):
+                    if int(elem[i]) != int(elem[i+1]):
+                        idx1 = edges2.index([int(elem[i]), int(elem[i+1])])
+                        if not self.diGraph: idx2 = edges2.index([int(elem[i+1]), int(elem[i])])
+                        edges2_colors[idx1] = 'r'
+                        if not self.diGraph: edges2_colors[idx2] = 'r'
 
-            pos = nx.planar_layout(G)
-            nx.draw(G, pos, edge_color=colors, with_labels=True)
-            plt.show()      
+                if self.diGraph:
+                    G = nx.DiGraph()
+                    for elem in edges2:
+                        idx = edges2.index(elem)
+                        G.add_edge(elem[0], elem[1], color = edges2_colors[idx])
+                
+                    colors = nx.get_edge_attributes(G,'color').values()
+
+                    pos = nx.circular_layout(G)
+                    if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+                    nx.draw(G, pos = pos, edge_color=colors, with_labels=True, connectionstyle='arc3, rad = 0.1')
+                    plt.show()
+                else:
+                    G = nx.Graph()
+                    for elem in edges2:
+                        idx = edges2.index(elem)
+                        G.add_edge(elem[0], elem[1], color = edges2_colors[idx])
+                
+                    colors = nx.get_edge_attributes(G,'color').values()
+
+                    pos = nx.circular_layout(G)
+                    if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+                    nx.draw(G, pos = pos, edge_color=colors, with_labels=True)
+                    plt.show()
     
     
     def show_graph(self):
@@ -163,11 +178,20 @@ class graph:
                     for k in range(self.adjacency_matrix[i][j]):
                         edges.append([i+1,j+1])
                     
-        if self.diGraph: G = nx.DiGraph()
-        else: G = nx.Graph()
-        G.add_edges_from(edges) 
-        nx.draw(G, pos = nx.planar_layout(G), with_labels=True)
-        plt.show()
+        if self.diGraph: 
+            G = nx.DiGraph()
+            G.add_edges_from(edges) 
+            pos = nx.circular_layout(G)
+            if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+            nx.draw(G, pos = pos, with_labels=True, connectionstyle='arc3, rad = 0.1')
+            plt.show()
+        else: 
+            G = nx.Graph()
+            G.add_edges_from(edges) 
+            pos = nx.circular_layout(G)
+            if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+            nx.draw(G, pos = pos, with_labels=True)
+            plt.show()
         
     def __convert_to_2d_list(self):
         '''
@@ -179,10 +203,9 @@ class graph:
         for elem in self.adjacency_matrix:
             A.append(list(elem));
         return A;
-  
 
 if __name__ == '__main__':      
-	A = graph([[0,1,1],[1,0,1],[1,1,0]])
-	A.show_graph()
-	A.show_paths(2)
-	A.show_paths_on_graph(1,2,2)
+    A = graph([[0,1,1],[1,0,1],[1,1,0]])
+    A.show_graph()
+    A.show_paths(2)
+    A.show_paths_on_graph(1,2,2)
