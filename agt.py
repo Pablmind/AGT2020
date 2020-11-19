@@ -5,21 +5,41 @@ from sympy import *
 
 class graph:
     def __init__(self, A, if_diGraph = False, special_layout = False):
+        #Инициализация матрицы смежности
         self.adjacency_matrix = np.array(A)
+
+        #Если граф ориентированный (diGraph = True): меняется отрисовка графа
         self.diGraph = if_diGraph
+
+        #Параметр для отрисовки специальный графов
         self.layout = special_layout
+        #special_layout = '' - 
+
+        self._line_length = 40;
         
-    def show_A(self, t: int) -> np.array:
+    def show_matrix(self, t: int) -> np.array:
         '''
         Метод вычисляет и выводит t-ую степень
         матрицы смежности.
-        
+
         '''
         
         A = np.array(self.adjacency_matrix)
+
+        print(np.linalg.matrix_power(A, t))
+
+    def get_matrix(self, t: int) -> np.array:
+        '''
+        Метод вычисляет и возвращает t-ую степень
+        матрицы смежности.
+
+        '''
+      
+        A = np.array(self.adjacency_matrix)
+
         return np.linalg.matrix_power(A, t)
     
-    def write_paths(self, t: int):
+    def write_paths(self, idx1: int, idx2: int, t: int):
         '''
         Заменяем значения матрицы на переменные и 
         символьно вычисляем t-ую степень.
@@ -47,37 +67,42 @@ class graph:
             
         B = np.array(A)
         
-        for i in range(len(B)):
-            for j in range(len(B)):
-                if B[i,j] != 0: 
-                    
-                    #каждый элемент матрицы разбиваем по плюсу
-                    #получаем все пути из i в j
-                    paths = str(B[i,j]).split('+')
-                    
-                    print(f'Пути из {i+1} в {j+1}:')
-
-                    #Выводим каждый путь в более читаемом формате
-                    for path in paths:
-                        path = path.strip().replace('*', '').replace('x', "->x").split('x')
-                        path = path[1:]
+        i = idx1 - 1
+        j = idx2 - 1
+        #for i in range(len(B)):
+        #    for j in range(len(B)):
+        if B[i,j] != 0: 
+            #каждый элемент матрицы разбиваем по плюсу
+            #получаем все пути из i в j
+            paths = str(B[i,j]).split('+')
                         
-                        if_first = True
-                        path_str = ""
-                        save_path = []
-                        
-                        while(len(path)>1):
-                            if if_first: 
-                                path_str += path[0] + path[1]
-                                if_first = False
-                            else:
-                                path_str += path[1]
+            print(f'Пути из {i+1} в {j+1}:')
 
-                            path = path[2:]
-                        #self.all_paths.append(path_str.split('->'))
-                        print(path_str)
-                    print('-'*20)
-            
+            #Выводим каждый путь в более читаемом формате
+            for path in paths:
+                path = path.strip().replace('*', '').replace('x', "->x").split('x')
+                path = path[1:]
+                            
+                if_first = True
+                path_str = ""
+                save_path = []
+                            
+                while(len(path)>1):
+                    if if_first: 
+
+                        path_str += path[0] + path[1]
+                        if_first = False
+                    else:
+                        path_str += path[1]
+
+                    path = path[2:]
+                #self.all_paths.append(path_str.split('->'))
+                print(path_str)
+            print('-'*self._line_length)
+        else:
+            print(f'Нет путей из {idx1} в {idx2} длины {t}')
+            print('-'*self._line_length)
+
     def show_paths_on_graph(self, v1 :int, v2 :int, t: int):
         '''
         Отрисовываем все пути из i в j длины t
@@ -114,7 +139,7 @@ class graph:
             
         #отрисовываем графы
         print(f'Все пути из {v1+1} в {v2+1} длины {t}:')
-        print('-'*40)
+        print('-'*self._line_length)
         if edges:
             for elem in edges:
                 
