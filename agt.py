@@ -4,18 +4,15 @@ import networkx as nx
 from sympy import *
 
 class graph:
-    def __init__(self, A, if_diGraph = False, special_layout = False):
+    def __init__(self, A, if_diGraph = False, graph_type = ""):
         #Инициализация матрицы смежности
         self.adjacency_matrix = np.array(A)
 
         #Если граф ориентированный (diGraph = True): меняется отрисовка графа
         self.diGraph = if_diGraph
 
-        #Параметр для отрисовки специальный графов
-        self.layout = special_layout
-        #special_layout = '' - 
-
         self._line_length = 40;
+        self._name = graph_type
         
     def show_matrix(self, t: int) -> np.array:
         '''
@@ -170,8 +167,7 @@ class graph:
                 
                     colors = nx.get_edge_attributes(G,'color').values()
 
-                    pos = nx.circular_layout(G)
-                    if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+                    pos = self.__get_pos(G)
                     nx.draw(G, pos = pos, edge_color=colors, with_labels=True, connectionstyle='arc3, rad = 0.1')
                     plt.show()
                 else:
@@ -182,8 +178,7 @@ class graph:
                 
                     colors = nx.get_edge_attributes(G,'color').values()
 
-                    pos = nx.circular_layout(G)
-                    if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+                    pos = self.__get_pos(G)
                     nx.draw(G, pos = pos, edge_color=colors, with_labels=True)
                     plt.show()
     
@@ -206,15 +201,13 @@ class graph:
         if self.diGraph: 
             G = nx.DiGraph()
             G.add_edges_from(edges) 
-            pos = nx.circular_layout(G)
-            if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+            pos = self.__get_pos(G)
             nx.draw(G, pos = pos, with_labels=True, connectionstyle='arc3, rad = 0.1')
             plt.show()
         else: 
             G = nx.Graph()
             G.add_edges_from(edges) 
-            pos = nx.circular_layout(G)
-            if self.layout: pos = nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+            pos = self.__get_pos(G)
             nx.draw(G, pos = pos, with_labels=True)
             plt.show()
         
@@ -229,8 +222,37 @@ class graph:
             A.append(list(elem));
         return A;
 
-if __name__ == '__main__':      
-    A = graph([[0,1,1],[1,0,1],[1,1,0]])
-    A.show_graph()
-    A.show_paths(2)
-    A.show_paths_on_graph(1,2,2)
+    def __get_pos(self, G):
+        if self._name == 'petersen': return nx.shell_layout(G, nlist = [range(6,11), range(1,6)]);
+        if self._name == 'bipartite': 
+            top = nx.bipartite.sets(G)[0]
+            return nx.bipartite_layout(G, top);
+        return nx.circular_layout(G)
+
+
+
+def load_petersen():
+    matrix = [[0,1,0,0,1,0,1,0,0,0],
+              [1,0,1,0,0,0,0,1,0,0],
+              [0,1,0,1,0,0,0,0,1,0],
+              [0,0,1,0,1,0,0,0,0,1],
+              [1,0,0,1,0,1,0,0,0,0],
+              [0,0,0,0,1,0,0,1,1,0],
+              [1,0,0,0,0,0,0,0,1,1],
+              [0,1,0,0,0,1,0,0,0,1],
+              [0,0,1,0,0,1,1,0,0,0],
+              [0,0,0,1,0,0,1,1,0,0]]
+
+    A = graph(matrix, if_diGraph = False)
+    A._name = 'petersen'
+    return A
+
+def load_K23():
+    matrix = [[0,0,1,1,1],
+              [0,0,1,1,1],
+              [1,1,0,0,0],
+              [1,1,0,0,0],
+              [1,1,0,0,0]]
+    A = graph(matrix, if_diGraph = False)
+    A._name = 'bipartite'
+    return A
