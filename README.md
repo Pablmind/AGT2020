@@ -20,7 +20,7 @@
 В файле example.ipynb содержится пример использования.
 
 ### Методы:
-1.Конструктор  
+##### 1.Конструктор  
 ```javascript
 __init__(self, A, if_diGraph = False, graph_type = "")   
 ```
@@ -28,19 +28,19 @@ A - матрица смежности
 if_diGraph = True - для ориентированных графов   
 graph_type = "petersen" или "bipartite"  
 
-2.Вывод матрицы  
+##### 2.Вывод матрицы  
 ```javascript
 def show_matrix(self, t: int)    
 ```
 t - степень матрицы
 
-3.Получение матрицы
+##### 3.Получение матрицы
 ```javascript
 def get_matrix(self, t: int) 
 ```
 t - степень матрицы
 
-4.Вывод путей
+##### 4.Вывод путей
 ```javascript
 def write_paths(self, idx1: int, idx2: int, t: int, file_path = "")
 ```
@@ -49,7 +49,7 @@ idx2 - конечная вершина
 t - длина пути  
 file_path - путь к файлу, в которой записать пути
 
-5.Отрисовка путей
+##### 5.Отрисовка путей
 ```javascript
 show_paths_on_graph(self, v1 :int, v2 :int, t: int)
 ```
@@ -57,7 +57,7 @@ v1 - начальная вершина
 v2 - конечная вершина  
 t - длина пути  
 
-6.Отрисовка графа
+##### 6.Отрисовка графа
 ```javascript
 def show_graph(self, save_path = "")
 ```
