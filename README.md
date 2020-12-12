@@ -19,5 +19,32 @@
 В файле agt.py содержится класс для графа с методами.  
 В файле example.ipynb содержится пример использования.
 
-### TODO:
-1. Добавить описание методов
+### Методы:
+- конструктор  
+```javascript
+__init__(self, A, if_diGraph = False, graph_type = "")   
+```
+A - матрица смежности   
+if_diGraph = True - для ориентированных графов   
+graph_type = "petersen" или "bipartite"  
+
+- Вывод матрицы  
+```javascript
+def show_matrix(self, t: int)    
+```
+t - степень матрицы
+
+- Получение матрицы
+```javascript
+def get_matrix(self, t: int) 
+```
+t - степень матрицы
+
+- Вывод путей
+```javascript
+def write_paths(self, idx1: int, idx2: int, t: int, file_path = "")
+```
+idx1 - начальная вершина  
+idx2 - конечная вершина  
+t - длина пути  
+file_path - путь к файла, в которой записать пути
