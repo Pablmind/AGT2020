@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
 from sympy import *
+import os
 
 class graph:
     def __init__(self, A, if_diGraph = False, graph_type = ""):
@@ -36,7 +37,7 @@ class graph:
 
         return np.linalg.matrix_power(A, t)
     
-    def write_paths(self, idx1: int, idx2: int, t: int):
+    def write_paths(self, idx1: int, idx2: int, t: int, file_path = ""):
         '''
         Заменяем значения матрицы на переменные и 
         символьно вычисляем t-ую степень.
@@ -69,6 +70,8 @@ class graph:
         #for i in range(len(B)):
         #    for j in range(len(B)):
         if B[i,j] != 0: 
+
+            if file_path: f = open(file_path, "a")
             #каждый элемент матрицы разбиваем по плюсу
             #получаем все пути из i в j
             paths = str(B[i,j]).split('+')
@@ -95,7 +98,10 @@ class graph:
                     path = path[2:]
                 #self.all_paths.append(path_str.split('->'))
                 print(path_str)
-            print('-'*self._line_length)
+                if file_path and not f.closed:
+                    f.write(path_str + "\n")
+            # print('-'*self._line_length)
+            if file_path and not f.closed: f.close()
         else:
             print(f'Нет путей из {idx1} в {idx2} длины {t}')
             print('-'*self._line_length)
@@ -136,7 +142,7 @@ class graph:
             
         #отрисовываем графы
         print(f'Все пути из {v1+1} в {v2+1} длины {t}:')
-        print('-'*self._line_length)
+        # print('-'*self._line_length)
         if edges:
             for elem in edges:
                 
@@ -182,8 +188,7 @@ class graph:
                     nx.draw(G, pos = pos, edge_color=colors, with_labels=True)
                     plt.show()
     
-    
-    def show_graph(self):
+    def show_graph(self, save_path = ""):
         '''
         По матрице смежности вычисляем ребра
         и выводим граф с помощью networkx
@@ -201,15 +206,19 @@ class graph:
         if self.diGraph: 
             G = nx.DiGraph()
             G.add_edges_from(edges) 
-            pos = self.__get_pos(G)
-            nx.draw(G, pos = pos, with_labels=True, connectionstyle='arc3, rad = 0.1')
-            plt.show()
+            # pos = self.__get_pos(G)
+            # nx.draw(G, pos = pos, with_labels=True, connectionstyle='arc3, rad = 0.1')
         else: 
             G = nx.Graph()
             G.add_edges_from(edges) 
-            pos = self.__get_pos(G)
-            nx.draw(G, pos = pos, with_labels=True)
-            plt.show()
+            # pos = self.__get_pos(G)
+            # nx.draw(G, pos = pos, with_labels=True)
+
+        pos = self.__get_pos(G)
+        nx.draw(G, pos = pos, with_labels=True, connectionstyle='arc3, rad = 0.1')
+
+        if save_path: plt.savefig(save_path)
+        plt.show()
         
     def __convert_to_2d_list(self):
         '''
@@ -228,7 +237,6 @@ class graph:
             top = nx.bipartite.sets(G)[0]
             return nx.bipartite_layout(G, top);
         return nx.circular_layout(G)
-
 
 
 def load_petersen():
