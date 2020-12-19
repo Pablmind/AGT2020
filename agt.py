@@ -146,6 +146,22 @@ class graph:
         if edges:
             for elem in edges:
                 
+                #Вывод пути
+                elem_save = elem.copy()
+
+                if_first = True
+                path_str = ""
+                save_path = []
+                while(len(elem_save)>1):
+                    if if_first: 
+                        path_str += elem_save[0] + "->" + elem_save[1]
+                        if_first = False
+                    else:
+                        path_str += "->" + elem_save[1]
+
+                    elem_save = elem_save[2:]
+                print(f'Путь: {path_str}, длина = {t}')
+                
                 edges2_colors = []
                 edges2 = []
                 
