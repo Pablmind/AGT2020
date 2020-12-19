@@ -131,78 +131,81 @@ class graph:
         
         B = np.array(A)
         
+        edges = []
         if B[v1,v2] != 0: 
             paths = str(B[v1,v2]).split('+')
             #Выводим каждый путь в более читаемом формате
-            edges = []
             for path in paths:
                 path = path.strip().replace('*', '').split('x')
                 edges.append(path[1:])
                 
             
         #отрисовываем графы
-        print(f'Все пути из {v1+1} в {v2+1} длины {t}:')
-        # print('-'*self._line_length)
         if edges:
-            for elem in edges:
-                
-                #Вывод пути
-                elem_save = elem.copy()
+            print(f'Количество путей из {v1+1} в {v2+1} длины {t} = {len(edges)}')
+            # print('-'*self._line_length)
+            if edges:
+                for elem in edges:
+                    
+                    #Вывод пути
+                    elem_save = elem.copy()
 
-                if_first = True
-                path_str = ""
-                save_path = []
-                while(len(elem_save)>1):
-                    if if_first: 
-                        path_str += elem_save[0] + "->" + elem_save[1]
-                        if_first = False
+                    if_first = True
+                    path_str = ""
+                    save_path = []
+                    while(len(elem_save)>1):
+                        if if_first: 
+                            path_str += elem_save[0] + "->" + elem_save[1]
+                            if_first = False
+                        else:
+                            path_str += "->" + elem_save[1]
+
+                        elem_save = elem_save[2:]
+                    print(f'{edges.index(elem)+1}) Путь: {path_str}, длина = {t}')
+                    
+                    edges2_colors = []
+                    edges2 = []
+                    
+                    for i in range(len(self.adjacency_matrix)):
+                        for j in range(len(self.adjacency_matrix)):
+                            if self.adjacency_matrix[i][j] > 0: 
+                                    edges2.append([i+1,j+1])
+                                    if not self.diGraph: edges2.append([j+1,i+1])
+                                    edges2_colors.append('k')
+                                    if not self.diGraph: edges2_colors.append('k')
+
+
+                    for i in range(len(elem)-1):
+                        if int(elem[i]) != int(elem[i+1]):
+                            idx1 = edges2.index([int(elem[i]), int(elem[i+1])])
+                            if not self.diGraph: idx2 = edges2.index([int(elem[i+1]), int(elem[i])])
+                            edges2_colors[idx1] = 'r'
+                            if not self.diGraph: edges2_colors[idx2] = 'r'
+
+                    if self.diGraph:
+                        G = nx.DiGraph()
+                        for elem in edges2:
+                            idx = edges2.index(elem)
+                            G.add_edge(elem[0], elem[1], color = edges2_colors[idx])
+                    
+                        colors = nx.get_edge_attributes(G,'color').values()
+
+                        pos = self.__get_pos(G)
+                        nx.draw(G, pos = pos, edge_color=colors, with_labels=True, connectionstyle='arc3, rad = 0.1')
+                        plt.show()
                     else:
-                        path_str += "->" + elem_save[1]
+                        G = nx.Graph()
+                        for elem in edges2:
+                            idx = edges2.index(elem)
+                            G.add_edge(elem[0], elem[1], color = edges2_colors[idx])
+                    
+                        colors = nx.get_edge_attributes(G,'color').values()
 
-                    elem_save = elem_save[2:]
-                print(f'Путь: {path_str}, длина = {t}')
-                
-                edges2_colors = []
-                edges2 = []
-                
-                for i in range(len(self.adjacency_matrix)):
-                    for j in range(len(self.adjacency_matrix)):
-                        if self.adjacency_matrix[i][j] > 0: 
-                                edges2.append([i+1,j+1])
-                                if not self.diGraph: edges2.append([j+1,i+1])
-                                edges2_colors.append('k')
-                                if not self.diGraph: edges2_colors.append('k')
-
-
-                for i in range(len(elem)-1):
-                    if int(elem[i]) != int(elem[i+1]):
-                        idx1 = edges2.index([int(elem[i]), int(elem[i+1])])
-                        if not self.diGraph: idx2 = edges2.index([int(elem[i+1]), int(elem[i])])
-                        edges2_colors[idx1] = 'r'
-                        if not self.diGraph: edges2_colors[idx2] = 'r'
-
-                if self.diGraph:
-                    G = nx.DiGraph()
-                    for elem in edges2:
-                        idx = edges2.index(elem)
-                        G.add_edge(elem[0], elem[1], color = edges2_colors[idx])
-                
-                    colors = nx.get_edge_attributes(G,'color').values()
-
-                    pos = self.__get_pos(G)
-                    nx.draw(G, pos = pos, edge_color=colors, with_labels=True, connectionstyle='arc3, rad = 0.1')
-                    plt.show()
-                else:
-                    G = nx.Graph()
-                    for elem in edges2:
-                        idx = edges2.index(elem)
-                        G.add_edge(elem[0], elem[1], color = edges2_colors[idx])
-                
-                    colors = nx.get_edge_attributes(G,'color').values()
-
-                    pos = self.__get_pos(G)
-                    nx.draw(G, pos = pos, edge_color=colors, with_labels=True)
-                    plt.show()
+                        pos = self.__get_pos(G)
+                        nx.draw(G, pos = pos, edge_color=colors, with_labels=True)
+                        plt.show()
+        else:
+            print("Нет таких путей")
     
     def show_graph(self, save_path = ""):
         '''
